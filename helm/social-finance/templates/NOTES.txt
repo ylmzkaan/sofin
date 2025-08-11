@@ -1,0 +1,72 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  {{- if eq .path "/" }}
+  The application is available at: {{ $host.host }}
+  {{- else }}
+  The application is available at: {{ $host.host }}{{ .path }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.frontend.service.type }}
+  Get the application URL by running these commands:
+{{- if .Values.global.clusterDomain }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "social-finance.fullname" $ }}-frontend)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "social-finance.fullname" $ }}-frontend)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- end }}
+{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "social-finance.fullname" $ }}-frontend'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "social-finance.fullname" $ }}-frontend --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.frontend.service.port }}
+{{- else if contains "ClusterIP" .Values.frontend.service.type }}
+  The application is accessible within the cluster at:
+  http://{{ include "social-finance.fullname" $ }}-frontend:{{ .Values.frontend.service.port }}
+{{- end }}
+
+{{- if .Values.postgres.enabled }}
+PostgreSQL is accessible within the cluster at:
+  {{ include "social-finance.fullname" $ }}-postgres:{{ .Values.postgres.service.port }}
+
+{{- if .Values.postgres.persistence.enabled }}
+  Data is persisted in a PersistentVolumeClaim.
+{{- end }}
+{{- end }}
+
+{{- if .Values.redis.enabled }}
+Redis is accessible within the cluster at:
+  {{ include "social-finance.fullname" $ }}-redis:{{ .Values.redis.service.port }}
+
+{{- if .Values.redis.persistence.enabled }}
+  Data is persisted in a PersistentVolumeClaim.
+{{- end }}
+{{- end }}
+
+{{- if .Values.autoscaling.enabled }}
+Autoscaling is enabled with:
+  - Minimum replicas: {{ .Values.autoscaling.minReplicas }}
+  - Maximum replicas: {{ .Values.autoscaling.maxReplicas }}
+{{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+  - Target CPU utilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}%
+{{- end }}
+{{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+  - Target memory utilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}%
+{{- end }}
+{{- end }}
+
+For more information, visit:
+  https://github.com/your-org/social-finance 

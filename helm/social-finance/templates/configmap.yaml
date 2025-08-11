@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "social-finance.fullname" . }}-config
+  labels:
+    {{- include "social-finance.labels" . | nindent 4 }}
+data:
+  # Database configuration
+  database_url: "postgresql://{{ .Values.postgres.db.user }}:{{ .Values.postgres.db.password }}@{{ include "social-finance.fullname" . }}-postgres:{{ .Values.postgres.service.port }}/{{ .Values.postgres.db.name }}"
+  
+  # Redis configuration
+  redis_url: "redis://{{ include "social-finance.fullname" . }}-redis:{{ .Values.redis.service.port }}"
+  
+  # JWT configuration
+  jwt_algorithm: "{{ .Values.jwt.algorithm }}"
+  jwt_access_token_expire_minutes: "{{ .Values.jwt.accessTokenExpireMinutes }}"
+  
+  # Stripe configuration
+  stripe_publishable_key: "{{ .Values.stripe.publishableKey }}"
+  
+  # File upload configuration
+  upload_dir: "{{ .Values.upload.dir }}"
+  max_file_size: "{{ .Values.upload.maxFileSize }}"
+  
+  # CORS configuration
+  allowed_origins: "{{ .Values.cors.allowedOrigins | join:"," }}" 

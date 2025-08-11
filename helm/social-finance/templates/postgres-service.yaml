@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "social-finance.fullname" . }}-postgres
+  labels:
+    {{- include "social-finance.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.postgres.service.port }}
+      targetPort: {{ .Values.postgres.service.port }}
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "social-finance.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres 

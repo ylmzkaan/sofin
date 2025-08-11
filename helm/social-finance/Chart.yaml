@@ -1,0 +1,17 @@
+apiVersion: v2
+name: social-finance
+description: A social finance platform for stock analysis and subscriptions
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - finance
+  - social
+  - analysis
+  - subscription
+home: https://github.com/yourusername/social-finance
+sources:
+  - https://github.com/yourusername/social-finance
+maintainers:
+  - name: Your Name
+    email: your.email@example.com 

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "social-finance.fullname" . }}-redis
+  labels:
+    {{- include "social-finance.labels" . | nindent 4 }}
+    app.kubernetes.io/component: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.redis.service.port }}
+      targetPort: {{ .Values.redis.service.port }}
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "social-finance.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: redis 

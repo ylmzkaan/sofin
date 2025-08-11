@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "social-finance.fullname" . }}-frontend
+  labels:
+    {{- include "social-finance.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+      targetPort: {{ .Values.frontend.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "social-finance.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend 
