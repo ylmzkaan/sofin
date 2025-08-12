@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { analysesAPI, subscriptionsAPI } from '../services/api';
+import { analysesAPI, subscriptionsAPI, usersAPI } from '../services/api';
 import { Plus, TrendingUp, Users, BarChart3, Clock, Eye, DollarSign } from 'lucide-react';
 
 const Dashboard = () => {
@@ -14,8 +14,8 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [analysesResponse, subscriptionsResponse] = await Promise.all([
-          analysesAPI.getMyAnalyses(),
-          subscriptionsAPI.getMySubscriptions(),
+          usersAPI.getMyAnalyses(),
+          usersAPI.getMySubscriptions(),
         ]);
         setMyAnalyses(analysesResponse.data);
         setMySubscriptions(subscriptionsResponse.data);
@@ -145,10 +145,10 @@ const Dashboard = () => {
                 <div key={analysis.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">
+                      <h3 className="font-semibold text-gray-900 mb-1 break-words overflow-wrap-anywhere">
                         {analysis.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2 break-words overflow-wrap-anywhere">
                         {analysis.content}
                       </p>
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -209,9 +209,9 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <img
-                        src={subscription.creator.avatar_url || '/default-avatar.png'}
+                        src={subscription.creator.profile_image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 85c0-16.6 13.4-30 30-30s30 13.4 30 30' fill='%23ccc'/%3E%3C/svg%3E"}
                         alt={subscription.creator.username}
-                        className="h-10 w-10 rounded-full"
+                        className="h-10 w-10 rounded-full object-cover"
                       />
                       <div>
                         <h4 className="font-semibold text-gray-900">

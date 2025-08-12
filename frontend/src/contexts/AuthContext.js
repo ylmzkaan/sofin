@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { api, authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -17,13 +17,33 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken'));
 
+  const logout = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    setRefreshToken(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  }, []);
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await authAPI.getMe();
+      setUser(response.data);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }, [logout]);
+
   useEffect(() => {
     if (token) {
       fetchUser();
     } else {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, fetchUser]);
 
   // Listen for unauthorized events from API interceptor
   useEffect(() => {
@@ -33,27 +53,12 @@ export const AuthProvider = ({ children }) => {
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
-  }, []);
-
-  const fetchUser = async () => {
-    try {
-      const response = await api.get('/auth/me');
-      setUser(response.data);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [logout]);
 
   const login = async (email, password) => {
     try {
-      const formData = new FormData();
-      formData.append('username', email);
-      formData.append('password', password);
+      const response = await authAPI.login(email, password);
       
-      const response = await api.post('/auth/token', formData);
       const { access_token, refresh_token } = response.data;
       
       // Set tokens first
@@ -77,8 +82,15 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
-      setUser(response.data);
+      await authAPI.register(userData);
+      
+      // Automatically log in the user after successful registration
+      const loginResult = await login(userData.email, userData.password);
+      
+      if (!loginResult.success) {
+        return { success: false, error: loginResult.error || 'Auto login failed' };
+      }
+      
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error);
@@ -110,14 +122,6 @@ export const AuthProvider = ({ children }) => {
       logout();
       throw error;
     }
-  };
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    setRefreshToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
   };
 
   const updateUser = (userData) => {

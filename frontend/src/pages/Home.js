@@ -12,7 +12,7 @@ const Home = () => {
   useEffect(() => {
     const fetchAnalyses = async () => {
       try {
-        const response = await analysesAPI.getAnalyses();
+        const response = await analysesAPI.getAllAnalyses();
         setAnalyses(response.data);
       } catch (error) {
         console.error('Error fetching analyses:', error);
@@ -75,9 +75,9 @@ const Home = () => {
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
                     <img
-                      src={analysis.author.avatar_url || '/default-avatar.png'}
+                      src={analysis.author.profile_image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 85c0-16.6 13.4-30 30-30s30 13.4 30 30' fill='%23ccc'/%3E%3C/svg%3E"}
                       alt={analysis.author.username}
-                      className="h-12 w-12 rounded-full"
+                      className="h-12 w-12 rounded-full object-cover"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -92,10 +92,10 @@ const Home = () => {
                         {new Date(analysis.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 break-words overflow-wrap-anywhere">
                       {analysis.title}
                     </h3>
-                    <p className="text-gray-600 mb-3 line-clamp-3">
+                    <p className="text-gray-600 mb-3 line-clamp-3 break-words overflow-wrap-anywhere">
                       {analysis.content}
                     </p>
                     <div className="flex items-center space-x-6 text-sm text-gray-500">

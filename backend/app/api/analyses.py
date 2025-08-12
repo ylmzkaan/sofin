@@ -11,6 +11,7 @@ router = APIRouter(prefix="/analyses", tags=["analyses"])
 
 
 @router.post("/", response_model=schemas.AnalysisResponse)
+@router.post("", response_model=schemas.AnalysisResponse, include_in_schema=False)
 def create_analysis(
     title: str = Form(...),
     content: str = Form(...),
@@ -18,7 +19,11 @@ def create_analysis(
     current_price: Optional[float] = Form(None),
     time_horizon: str = Form(...),
     ticker_symbol: Optional[str] = Form(None),
-    images: Optional[List[UploadFile]] = File(None),
+    image1: Optional[UploadFile] = File(None),
+    image2: Optional[UploadFile] = File(None),
+    image3: Optional[UploadFile] = File(None),
+    image4: Optional[UploadFile] = File(None),
+    image5: Optional[UploadFile] = File(None),
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -39,6 +44,7 @@ def create_analysis(
     db.refresh(analysis)
     
     # Handle image uploads
+    images = [img for img in [image1, image2, image3, image4, image5] if img is not None]
     if images:
         for image in images:
             if image.content_type.startswith('image/'):
@@ -65,6 +71,7 @@ def create_analysis(
 
 
 @router.get("/", response_model=List[schemas.AnalysisResponse])
+@router.get("", response_model=List[schemas.AnalysisResponse], include_in_schema=False)
 def get_analyses(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
@@ -81,7 +88,7 @@ def get_analyses(
     if ticker_symbol:
         query = query.filter(models.Analysis.ticker_symbol == ticker_symbol)
     
-    analyses = query.offset(skip).limit(limit).order_by(models.Analysis.created_at.desc()).all()
+    analyses = query.order_by(models.Analysis.created_at.desc()).offset(skip).limit(limit).all()
     return analyses
 
 

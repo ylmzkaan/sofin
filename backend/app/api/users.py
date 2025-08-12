@@ -49,36 +49,12 @@ def get_users(
     return result
 
 
-@router.get("/{user_id}", response_model=schemas.UserWithStats)
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    """Get user by ID with statistics"""
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Calculate statistics
-    total_analyses = db.query(func.count(models.Analysis.id)).filter(
-        models.Analysis.author_id == user.id
-    ).scalar()
-    
-    success_count = db.query(func.count(models.Analysis.id)).filter(
-        models.Analysis.author_id == user.id,
-        models.Analysis.success_status == "success"
-    ).scalar()
-    
-    success_rate = (success_count / total_analyses * 100) if total_analyses > 0 else None
-    
-    subscriber_count = db.query(func.count(models.Subscription.id)).filter(
-        models.Subscription.creator_id == user.id,
-        models.Subscription.status == "active"
-    ).scalar()
-    
-    return schemas.UserWithStats(
-        **user.__dict__,
-        total_analyses=total_analyses,
-        success_rate=success_rate,
-        subscriber_count=subscriber_count
-    )
+@router.get("/me", response_model=schemas.UserResponse)
+def get_my_profile(
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    """Get current user profile"""
+    return current_user
 
 
 @router.put("/me", response_model=schemas.UserResponse)
@@ -132,4 +108,36 @@ def get_my_subscribers(
         models.Subscription.creator_id == current_user.id
     ).all()
     
-    return subscriptions 
+    return subscriptions
+
+
+@router.get("/{user_id}", response_model=schemas.UserWithStats)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    """Get user by ID with statistics"""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate statistics
+    total_analyses = db.query(func.count(models.Analysis.id)).filter(
+        models.Analysis.author_id == user.id
+    ).scalar()
+    
+    success_count = db.query(func.count(models.Analysis.id)).filter(
+        models.Analysis.author_id == user.id,
+        models.Analysis.success_status == "success"
+    ).scalar()
+    
+    success_rate = (success_count / total_analyses * 100) if total_analyses > 0 else None
+    
+    subscriber_count = db.query(func.count(models.Subscription.id)).filter(
+        models.Subscription.creator_id == user.id,
+        models.Subscription.status == "active"
+    ).scalar()
+    
+    return schemas.UserWithStats(
+        **user.__dict__,
+        total_analyses=total_analyses,
+        success_rate=success_rate,
+        subscriber_count=subscriber_count
+    ) 

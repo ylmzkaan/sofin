@@ -149,9 +149,9 @@ const Users = () => {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <img
-                  src={analyst.profile_image || '/default-avatar.png'}
+                  src={analyst.profile_image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 85c0-16.6 13.4-30 30-30s30 13.4 30 30' fill='%23ccc'/%3E%3C/svg%3E"}
                   alt={analyst.username}
-                  className="h-12 w-12 rounded-full"
+                  className="h-12 w-12 rounded-full object-cover"
                 />
                 <div>
                   <div className="flex items-center space-x-2">

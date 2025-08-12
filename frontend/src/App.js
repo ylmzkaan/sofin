@@ -15,13 +15,13 @@ import UserProfile from './pages/UserProfile';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, token, loading } = useAuth();
   
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
   
-  if (!user) {
+  if (!user || !token) {
     return <Navigate to="/login" replace />;
   }
   
@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   
   return (
     <Router>
@@ -38,8 +38,8 @@ function AppContent() {
         <main className="container mx-auto px-4 py-8">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-            <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
+            <Route path="/login" element={user && token ? <Navigate to="/dashboard" replace /> : <Login />} />
+            <Route path="/register" element={user && token ? <Navigate to="/dashboard" replace /> : <Register />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />

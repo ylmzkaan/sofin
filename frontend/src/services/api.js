@@ -4,23 +4,25 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token (robust for Axios v1 headers)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    
     if (token) {
+      // Ensure headers object exists
+      if (!config.headers) {
+        config.headers = {};
+      }
+      
+      // Set Authorization header
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor to handle errors
@@ -68,10 +70,13 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: (email, password) => {
-    const formData = new FormData();
-    formData.append('username', email);
-    formData.append('password', password);
-    return api.post('/auth/token', formData);
+    const params = new URLSearchParams();
+    params.append('username', email);
+    params.append('password', password);
+    
+    return api.post('/auth/token', params, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
   },
   register: (userData) => api.post('/auth/register', userData),
   getMe: () => api.get('/auth/me'),

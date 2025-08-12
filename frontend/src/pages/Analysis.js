@@ -112,7 +112,7 @@ const Analysis = () => {
           <span className="text-gray-900">Analysis</span>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{analysis.title}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 break-words overflow-wrap-anywhere">{analysis.title}</h1>
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -121,9 +121,9 @@ const Analysis = () => {
               className="flex items-center space-x-3 hover:opacity-80"
             >
               <img
-                src={analysis.author.avatar_url || '/default-avatar.png'}
+                src={analysis.author.profile_image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 85c0-16.6 13.4-30 30-30s30 13.4 30 30' fill='%23ccc'/%3E%3C/svg%3E"}
                 alt={analysis.author.username}
-                className="h-12 w-12 rounded-full"
+                className="h-12 w-12 rounded-full object-cover"
               />
               <div>
                 <p className="font-semibold text-gray-900">{analysis.author.username}</p>
@@ -223,7 +223,7 @@ const Analysis = () => {
           <div className="card mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Analysis</h2>
             <div className="prose max-w-none">
-              <p className="text-gray-700 whitespace-pre-wrap">{analysis.content}</p>
+              <p className="text-gray-700 whitespace-pre-wrap break-words overflow-wrap-anywhere">{analysis.content}</p>
             </div>
           </div>
 
@@ -272,9 +272,9 @@ const Analysis = () => {
         <h2 className="text-xl font-semibold text-gray-900 mb-6">About the Analyst</h2>
         <div className="flex items-start space-x-4">
           <img
-            src={analysis.author.avatar_url || '/default-avatar.png'}
+            src={analysis.author.profile_image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 85c0-16.6 13.4-30 30-30s30 13.4 30 30' fill='%23ccc'/%3E%3C/svg%3E"}
             alt={analysis.author.username}
-            className="h-16 w-16 rounded-full"
+            className="h-16 w-16 rounded-full object-cover"
           />
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">

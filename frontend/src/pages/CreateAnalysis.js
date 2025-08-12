@@ -69,7 +69,7 @@ const CreateAnalysis = () => {
       }
 
       imageFiles.forEach((file, index) => {
-        formData.append('images', file);
+        formData.append(`image${index + 1}`, file);
       });
 
       const response = await analysesAPI.createAnalysis(formData);
